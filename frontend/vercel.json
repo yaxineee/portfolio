@@ -1,7 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "public": true,
   "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
@@ -26,8 +25,5 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/$1" }
   ]
 }
