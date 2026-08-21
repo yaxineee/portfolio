@@ -1,0 +1,66 @@
+/* tokens.css
+ * LODEV — GPT-Taste reference design system.
+ * Dark, single accent (lime), Space Grotesk for everything.
+ */
+
+:root {
+  /* --- Color: dark-first --- */
+  --bg-primary:    #0a0a0a;
+  --bg-card:       #111111;
+  --bg-card-alt:   #161616;
+  --bg-elev:       #1a1a1a;
+
+  --text-primary:   #f5f5f5;
+  --text-secondary: #888888;
+  --text-muted:     #555555;
+
+  --accent:         #c8ff00;
+  --accent-dim:     #c8ff0033;
+  --accent-glow:    #c8ff0055;
+
+  --border:         rgba(255, 255, 255, 0.06);
+  --border-strong:  rgba(255, 255, 255, 0.12);
+
+  --whatsapp:       #25D366;
+  --whatsapp-deep:  #20B858;
+
+  /* --- Typography --- */
+  --font-display: 'Space Grotesk', 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-arabic:  'IBM Plex Sans Arabic', 'Tajawal', 'Noto Naskh Arabic', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* --- Tracking --- */
+  --tracking-tight:  -0.03em;
+  --tracking-tighter: -0.04em;
+  --tracking-display: -0.06em;
+  --tracking-label:   0.15em;
+  --tracking-mono:    0.02em;
+
+  /* --- Spacing --- */
+  --container-max: 1280px;
+  --container-px:  24px;
+  --section-py:    8rem;
+  --section-py-md: 10rem;
+
+  /* --- Motion --- */
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 640ms;
+
+  /* --- Type scale --- */
+  --type-display: clamp(3rem, 6vw, 5.5rem);
+  --type-h2:      clamp(2rem, 4vw, 3.5rem);
+  --type-h3:      clamp(1.5rem, 2.5vw, 2rem);
+  --type-h4:      clamp(1.15rem, 1.5vw, 1.35rem);
+  --type-body:    clamp(1rem, 1.1vw, 1.125rem);
+  --type-small:   clamp(0.85rem, 0.9vw, 0.95rem);
+  --type-label:   0.7rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --container-px: 40px;
+  }
+}
