@@ -14,7 +14,7 @@
 set -euo pipefail
 
 BACKEND_URL="${BACKEND_URL:-https://yaxis.lodev.store}"
-FRONTEND_URL="${FRONTEND_URL:-https://yaxis.vercel.app}"
+FRONTEND_URL="${FRONTEND_URL:-https://yaxxis.vercel.app}"
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="$( cd "${SCRIPT_DIR}/.." && pwd )"
