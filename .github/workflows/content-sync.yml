@@ -1,0 +1,77 @@
+name: Content sync
+
+on:
+  schedule:
+    - cron: '0 * * * *' # hourly
+  workflow_dispatch: # manual "Run workflow" button
+
+permissions:
+  contents: write
+
+concurrency:
+  group: content-sync
+  cancel-in-progress: false
+
+env:
+  BACKEND_URL: https://yaxis.lodev.store
+  FRONTEND_URL: https://yaxxis.vercel.app
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch rendered page from backend
+        run: |
+          curl -fsS --max-time 30 "${BACKEND_URL}/?sync=$(date +%s)" -o /tmp/raw.html \
+            || { echo "::error::Backend unreachable - keep index.php deployed on Namecheap"; exit 1; }
+
+          FE_ENC=$(python3 -c "import urllib.parse;print(urllib.parse.quote('${FRONTEND_URL}/',safe=''))")
+
+          sed \
+            -e "s|href=\"/api/setlang.php?lang=en&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=en\&amp;next=${FE_ENC}\"|g" \
+            -e "s|href=\"/api/setlang.php?lang=fr&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=fr\&amp;next=${FE_ENC}\"|g" \
+            -e "s|href=\"/api/setlang.php?lang=ar&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=ar\&amp;next=${FE_ENC}\"|g" \
+            -e "s|content=\"/uploads/|content=\"${FRONTEND_URL}/uploads/|g" \
+            -e "s|href=\"${BACKEND_URL}/\"|href=\"${FRONTEND_URL}/\"|g" \
+            -e "s|content=\"${BACKEND_URL}/\"|content=\"${FRONTEND_URL}/\"|g" \
+            /tmp/raw.html > /tmp/transformed.html
+
+      - name: Cache-bust assets (stable per content hash)
+        run: |
+          V=$(cd frontend && find assets -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-12)
+          sed -i \
+            -e "s|href=\"/assets/css/\([a-z]*\)\.css\"|href=\"/assets/css/\1.css?v=${V}\"|g" \
+            -e "s|src=\"/assets/js/\([a-z]*\)\.js\"|src=\"/assets/js/\1.js?v=${V}\"|g" \
+            /tmp/transformed.html
+
+      - name: Download uploads that only exist on the backend
+        run: |
+          grep -o '/uploads/[A-Za-z0-9._-]*' /tmp/transformed.html | sort -u | while read -r img; do
+            if [ ! -f "frontend${img}" ]; then
+              echo "Fetching new upload ${img}"
+              mkdir -p "frontend$(dirname "${img}")"
+              curl -fsS --max-time 60 --retry 3 "${BACKEND_URL}${img}" -o "frontend${img}" \
+                || { echo "::error::Could not download ${BACKEND_URL}${img}"; exit 1; }
+            fi
+          done
+
+      - name: Commit and push if content changed
+        run: |
+          if cmp -s frontend/index.html /tmp/transformed.html; then
+            rm -f /tmp/transformed.html
+          else
+            mv /tmp/transformed.html frontend/index.html
+          fi
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes since last sync."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Content sync: update from admin ($(date -u '+%Y-%m-%d %H:%M UTC'))"
+          git push
