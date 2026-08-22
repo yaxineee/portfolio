@@ -34,6 +34,7 @@ jobs:
             -e "s|href=\"/api/setlang.php?lang=fr&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=fr\&amp;next=${FE_ENC}\"|g" \
             -e "s|href=\"/api/setlang.php?lang=ar&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=ar\&amp;next=${FE_ENC}\"|g" \
             -e "s|content=\"/uploads/|content=\"${FRONTEND_URL}/uploads/|g" \
+            -e "s|<span class=\"pill pill-status\" data-status=\"[^\"]*\"></span>||g" \
             -e "s|href=\"${BACKEND_URL}/\"|href=\"${FRONTEND_URL}/\"|g" \
             -e "s|content=\"${BACKEND_URL}/\"|content=\"${FRONTEND_URL}/\"|g" \
             /tmp/raw.html > /tmp/transformed.html

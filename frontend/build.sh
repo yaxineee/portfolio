@@ -55,6 +55,7 @@ sed -i.bak \
   -e "s|href=\"/api/setlang.php?lang=fr\\&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=fr\&amp;next=${FRONTEND_ENCODED}\"|g" \
   -e "s|href=\"/api/setlang.php?lang=ar\\&amp;next=[^\"]*\"|href=\"${BACKEND_URL}/api/setlang.php?lang=ar\&amp;next=${FRONTEND_ENCODED}\"|g" \
   -e "s|content=\"/uploads/|content=\"${FRONTEND_URL}/uploads/|g" \
+  -e "s|<span class=\"pill pill-status\" data-status=\"[^\"]*\"></span>||g" \
   -e "s|href=\"https://yaxis.lodev.store/\"|href=\"${FRONTEND_URL}/\"|g" \
   -e "s|content=\"https://yaxis.lodev.store/\"|content=\"${FRONTEND_URL}/\"|g" \
   -e "s|content=\"https://yaxis.lodev.store\"|content=\"${FRONTEND_URL}\"|g" \
