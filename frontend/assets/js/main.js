@@ -150,29 +150,42 @@
   }
 
   /* ============================================================
-     6. h2 scrub text reveal (gpt-taste)
-     Each word starts at opacity 0.1 and scrubs to 1.0 sequentially.
+     6. h2 scroll reveal (gpt-taste)
+     Every h2 fades up + slides into place as it enters the viewport.
+     Words inside the h2 reveal sequentially as the user scrolls past
+     (opacity scrubs 0.1 → 1.0 with stagger).
      ============================================================ */
   function initH2ScrubReveal() {
     if (typeof ScrollTrigger === 'undefined') return;
 
-    // Select h2s that aren't already custom (manifesto uses its own structure)
-    const headings = document.querySelectorAll(
-      '.process-headline, .testimonials-headline, .footer-cta h2, .showcase-head .section-title'
-    );
+    // All h2s in the page
+    const headings = document.querySelectorAll('h2');
 
     headings.forEach((h2) => {
       if (h2.dataset.scrubReady === '1') return;
       h2.dataset.scrubReady = '1';
 
-      // Skip if it has child elements with class containing "bleed" or "word"
+      // 1) Fade-up the h2 itself when it enters the viewport
+      gsap.from(h2, {
+        opacity: 0,
+        y: 32,
+        duration: 0.9,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: h2,
+          start: 'top 88%',
+          toggleActions: 'play none none reverse',
+        },
+      });
+
+      // 2) Skip the per-word scrub if the h2 has child structure
+      //    (manifesto uses .manifesto-word, hero uses .hero-word, etc.)
       if (h2.querySelector('.bleed, .word, .manifesto-word, .hero-word')) return;
 
-      // Capture original text and rebuild with word spans
-      const original = h2.innerHTML;
-      // Strip surrounding tags but keep inline ones (em, strong)
+      // 3) Per-word scrub: each word starts at opacity 0.1 and
+      //    scrubs to 1.0 sequentially as the user scrolls past.
       const tmp = document.createElement('div');
-      tmp.innerHTML = original;
+      tmp.innerHTML = h2.innerHTML;
       const text = tmp.textContent.trim();
       if (!text) return;
 
@@ -192,10 +205,11 @@
       spans.forEach((span, i) => {
         gsap.to(span, {
           opacity: 1,
+          ease: 'none',
           scrollTrigger: {
             trigger: h2,
-            start: `top ${90 - i * 1.5}%`,
-            end: `top ${60 - i * 1.5}%`,
+            start: `top ${90 - i * 4}%`,
+            end: `top ${60 - i * 4}%`,
             scrub: true,
           },
         });

@@ -94,7 +94,8 @@ section {
   font-size: var(--type-body);
   color: var(--text-secondary);
   max-width: 40rem;
-  margin-top: 1rem;
+  margin: 1rem auto 0;
+  text-align: center;
 }
 
 /* --- Color helpers --- */

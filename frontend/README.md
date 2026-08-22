@@ -23,7 +23,7 @@ frontend/
 ```bash
 # 1. Set the env vars (or put them in .env)
 export BACKEND_URL=https://yaxis.lodev.store
-export FRONTEND_URL=https://yaxis.vercel.app
+export FRONTEND_URL=https://yaxxis.vercel.app
 
 # 2. Run the build script
 ./build.sh
@@ -47,7 +47,7 @@ vercel --prod
 | Var | Example | Purpose |
 |---|---|---|
 | `BACKEND_URL` | `https://yaxis.lodev.store` | The PHP backend origin. Used to rewrite `/api/...` and `/uploads/...` to absolute URLs. |
-| `FRONTEND_URL` | `https://yaxis.vercel.app` | This Vercel deployment. Used as the `next=` param for the language switcher, so the user lands back on the Vercel origin after switching language. |
+| `FRONTEND_URL` | `https://yaxxis.vercel.app` | This Vercel deployment. Used as the `next=` param for the language switcher, so the user lands back on the Vercel origin after switching language. |
 
 In Vercel, set these under **Project Settings → Environment Variables**.
 Locally, set them in your shell or copy `.env.example` to `.env`.
