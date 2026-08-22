@@ -61,6 +61,17 @@ sed -i.bak \
   "${TMP_DIR}/raw.html"
 rm -f "${TMP_DIR}/raw.html.bak"
 
+# 3b. Cache-bust local assets. /assets/* is served immutable for 1 year,
+#     so every build must stamp a fresh ?v= or returning visitors keep
+#     seeing the previous version's CSS/JS.
+BUILD_ID="$(date +%Y%m%d%H%M)"
+sed -i.bak \
+  -e "s|href=\"/assets/css/\([a-z]*\)\.css\"|href=\"/assets/css/\1.css?v=${BUILD_ID}\"|g" \
+  -e "s|src=\"/assets/js/\([a-z]*\)\.js\"|src=\"/assets/js/\1.js?v=${BUILD_ID}\"|g" \
+  "${TMP_DIR}/raw.html"
+rm -f "${TMP_DIR}/raw.html.bak"
+echo "==> Asset cache-bust version: ${BUILD_ID}"
+
 # 4. Self-host user uploads: copy them into the deploy so images never
 #    depend on cross-origin requests to the backend.
 echo "==> Copying uploads into ${SCRIPT_DIR}/uploads ..."
@@ -86,7 +97,13 @@ if ! grep -q "content=\"${FRONTEND_URL}/uploads/" "${SCRIPT_DIR}/index.html"; th
   exit 1
 fi
 for img in $(grep -o 'src="/uploads/[^"]*"' "${SCRIPT_DIR}/index.html" | sed 's|src="||;s|"||' | sort -u); do
-  [ -f "${SCRIPT_DIR}${img}" ] || { echo "!! Missing self-hosted upload: ${SCRIPT_DIR}${img}" >&2; exit 1; }
+  if [ ! -f "${SCRIPT_DIR}${img}" ]; then
+    # Uploaded via admin -> exists only on the backend. Pull it into the deploy.
+    echo "==> Fetching new upload from backend: ${img}"
+    mkdir -p "${SCRIPT_DIR}/$(dirname "${img}")"
+    curl -fsS --max-time 60 "${BACKEND_URL}${img}" -o "${SCRIPT_DIR}${img}" \
+      || { echo "!! Could not download ${BACKEND_URL}${img}" >&2; exit 1; }
+  fi
 done
 
 echo "==> Done."
